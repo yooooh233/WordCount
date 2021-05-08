@@ -1,55 +1,59 @@
-#include <stdio.h>
-//统计文件的字符数
-int count_char(char file[])
-{
-    int char_num = 0;
-    char ch;
-    freopen(file, "r", stdin); //重定向输入
-    while ((ch = getchar()) != EOF)
-    {
-        //if (ch != ' '&&ch != '\n'&&ch != '\t')
-        char_num++;
-    }
-    fclose(stdin);
-    return char_num;
-}
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+void wcexe(char *filename,char s){
+    FILE *fp;
+    char buffer[1000];
+    char c;
+    int bufferlen;
+    int isLastBlank = 0; // 上个字符是否是空格(1表示是  0表示不是)
+    int charCount=0;
+    int wordCount=0;
+    int i;
+    char x=s;
 
-int main(int argc, char *argv[])
-{
-    //对单个.c文件的统计
-    int num_para;
-    for (num_para = argc - 1; num_para > 1; num_para--)
-    {
-        if (strcmp(argv[num_para], "-s") == 0 || strcmp(argv[num_para], "-x") == 0 || strcmp(argv[num_para], "-c") == 0 || strcmp(argv[num_para], "-w") == 0 || strcmp(argv[num_para], "-l") == 0 || strcmp(argv[num_para], "-a") == 0)
-        {
-            break;
+    if((fp=fopen(filename,"rb"))==NULL){
+        printf("文件不能打开\n");
+        exit(0);
+    }
+    while(fgets(buffer,1000,fp)!=NULL){
+        bufferlen=strlen(buffer);
+        for(i=0;i<bufferlen;i++){
+            c=buffer[i];
+
+            if(c==' '|| c=='\t'||c==','){
+                if(isLastBlank==0){
+                    charCount++;
+                    wordCount++;
+                }
+                isLastBlank=1;
+            }else if(c!='\n'&&c!='\r'){
+                charCount++;
+                isLastBlank=0;
+            }
+
         }
+        if(isLastBlank==0)
+            wordCount++;
+        isLastBlank=1;
+
     }
-    char filename[500] = {0};
-    strcat(filename, argv[num_para + 1]);
-    for (int i = num_para + 2; i < argc; i++)
-    {
-        strcat(filename, " ");
-        strcat(filename, argv[i]);
+
+    if(x=='c'){
+        printf("字符数：%d\n",charCount);
     }
-    int flag_3 = check_file_name(filename);
-    if (flag_3 == -1)
-    {
-        printf("Error:The file does not exist !\n");
-        return 0;
+    else if(x=='w'){
+        printf("单词数：%d\n",wordCount);
     }
-    else if (flag_3 == -2)
-    {
-        printf("Error:The file has no read permissions !\n");
-        return 0;
-    }
-    printf("%s:\n", filename);
-    for (int i = 1; i <= num_para; i++)
-    {
-        if (check_command(argv[i]) == 1)
-            basic_command(argv[i], filename);
-        else
-            printf("Command parameter error !\n");
-    }
+
+
+    fclose(fp);
+}
+int main(){
+//    char filename[]="test.txt"
+    char s;
+    scanf("%s",&s);
+    char filename[]="/Users/jiangxueyao/CLionProjects/untitled/test.txt";
+    wcexe(filename,s);
     return 0;
 }
